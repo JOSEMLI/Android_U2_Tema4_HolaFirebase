@@ -27,8 +27,9 @@ public class AdapterProducto  extends RecyclerView.Adapter<AdapterProducto.ViewH
   }
   @Override
   public void onBindViewHolder(ViewHolder holder, final int i) {
-    holder.miid.setText(datos.get(i).getId());
+    //holder.miid.setText(datos.get(i).getId());
     holder.nombreproducto.setText(datos.get(i).getNombre());
+    holder.miid.setText("$" + datos.get(i).getPrecio());
     holder.itemView.setOnClickListener(new View.OnClickListener(){
       @Override
       public void onClick(View v) {
