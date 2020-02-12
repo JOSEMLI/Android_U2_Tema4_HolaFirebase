@@ -6,11 +6,17 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
+
+import butterknife.OnClick;
 
 public class AdapterProducto  extends RecyclerView.Adapter<AdapterProducto.ViewHolder> {
   private LayoutInflater inflador; ArrayList<Producto> datos; Context micontext;
@@ -38,6 +44,15 @@ public class AdapterProducto  extends RecyclerView.Adapter<AdapterProducto.ViewH
         intent.putExtra("nombreproducto",datos.get(i).getNombre());
       }
     });
+    //se implemento estas lineas para eliminar
+    holder.btndelete.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference("PRODUCTOS");
+        reference.child(datos.get(i).getId()).removeValue();
+      }
+    });
   }
   @Override
   public int getItemCount() {
@@ -45,10 +60,20 @@ public class AdapterProducto  extends RecyclerView.Adapter<AdapterProducto.ViewH
   }
   public class ViewHolder extends RecyclerView.ViewHolder {
     public TextView miid, nombreproducto;
+
+    //se enlazo con el holder con el bootton
+    Button btndelete;
+
     ViewHolder(View itemView) {
       super(itemView);
       miid = (TextView)itemView.findViewById(R.id.id_text);
       nombreproducto = (TextView)itemView.findViewById(R.id.nombre);
+      //se identifico con el botton
+      btndelete = (Button) itemView.findViewById(R.id.btnDelete);
     }
   }
+
+
+
+
 }

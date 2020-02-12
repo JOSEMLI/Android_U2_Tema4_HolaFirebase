@@ -1,6 +1,7 @@
 package com.example.android_u2_tema4_holafirebase;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -77,6 +78,8 @@ public class MainActivity  extends AppCompatActivity {
     etPrice.setText("");
   }
 
+
+
 //se agrego 2
 
   void AddItems(){
@@ -90,17 +93,40 @@ public class MainActivity  extends AppCompatActivity {
         }
         recyclerView.getAdapter().notifyDataSetChanged();
       }
+      //se modifico o se implemento esto ultimo metodos 3
       @Override
       public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        Producto producto = dataSnapshot.getValue(Producto.class);
+        producto.setId(dataSnapshot.getKey()); int index=-1;
+        for (Producto prod : misdatos) {
+          Log.i("iteracion", prod.getId() + " = " + producto.getId());
+          index++;
+          if (prod.getId().equals(producto.getId())) {
+            misdatos.set(index, producto); break;
+          }
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
       }
       @Override
       public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+        Producto producto = dataSnapshot.getValue(Producto.class);
+        producto.setId(dataSnapshot.getKey()); int index=-1;
+        for (Producto prod : misdatos) {
+          Log.i("iteracion", prod.getId() + " = " + producto.getId());
+          index++;
+          if (prod.getId().equals(producto.getId())) {
+            misdatos.remove(index); break;
+          }
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
       }
       @Override
       public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        Toast.makeText(MainActivity.this,"Se movio el producto",Toast.LENGTH_LONG).show();
       }
       @Override
       public void onCancelled(@NonNull DatabaseError databaseError) {
+        Toast.makeText(MainActivity.this,"Transaccion cancelada",Toast.LENGTH_LONG).show();
       }
     });
   }
