@@ -4,19 +4,19 @@ public class Producto {
 
   private String id;
   private String nombre;
-  private String precio;
+  private Double precio;
 
 
   public Producto() {
   }
 
-  public Producto(String nombre, String precio) {
+  public Producto(String nombre, double precio) {
     this.nombre = nombre;
     this.precio = precio;
   }
 
 
-  public Producto(String id, String nombre, String precio) {
+  public Producto(String id, String nombre, double precio) {
     this.id = id;
     this.nombre = nombre;
     this.precio = precio;
@@ -38,11 +38,11 @@ public class Producto {
     this.nombre = nombre;
   }
 
-  public String getPrecio() {
+  public double getPrecio() {
     return precio;
   }
 
-  public void setPrecio(String precio) {
+  public void setPrecio(double precio) {
     this.precio = precio;
   }
 }

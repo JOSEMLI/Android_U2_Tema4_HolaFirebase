@@ -18,6 +18,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -43,6 +45,9 @@ public class MainActivity  extends AppCompatActivity {
   private RecyclerView.LayoutManager layoutManager;
   private AdapterProducto adaptador;
   private ArrayList<Producto> misdatos;
+
+  Query query;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -63,7 +68,14 @@ public class MainActivity  extends AppCompatActivity {
     recyclerView.setAdapter(adaptador);
     layoutManager = new LinearLayoutManager(this);
     recyclerView.setLayoutManager(layoutManager);
-    AddItems();
+
+
+    query = FirebaseDatabase.getInstance().getReference("PRODUCTOS")
+            .orderByChild("precio")
+            .startAt(100.00);
+
+    consultarquery();
+    //AddItems();
   }
 
 
@@ -72,7 +84,7 @@ public class MainActivity  extends AppCompatActivity {
     Toast.makeText(this, "Probando boton",Toast.LENGTH_LONG).show();
 //agregamos estas lineas 1
     Producto producto = new Producto(etName.getText().toString().trim(),
-        etPrice.getText().toString().trim());
+            Double.valueOf(etPrice.getText().toString()));
     //reference.push().setValue(producto);
     Producto productoupdate= getProducto(producto.getNombre());
     if(productoupdate != null){
@@ -146,6 +158,87 @@ public class MainActivity  extends AppCompatActivity {
     });
   }
 
+
+  ValueEventListener valueEventListener = new ValueEventListener() {
+    @Override
+    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+      misdatos.clear();
+      if(dataSnapshot.exists()){
+        for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+          Producto producto = snapshot.getValue(Producto.class);
+          misdatos.add(producto);
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
+      }
+    }
+
+    @Override
+    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+    }
+  };
+
+
+  void consultarquery(){
+    query.addChildEventListener(new ChildEventListener() {
+      @Override
+      public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        Producto producto = dataSnapshot.getValue(Producto.class);
+        producto.setId(dataSnapshot.getKey());
+        if (!misdatos.contains(producto)) {
+          misdatos.add(producto);
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
+      }
+
+      @Override
+      public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        Producto producto = dataSnapshot.getValue(Producto.class);
+        producto.setId(dataSnapshot.getKey());
+        int index = -1;
+        for (Producto prod : misdatos) {
+          Log.i("iteracion", prod.getId() + " = " + producto.getId());
+          index++;
+          if (prod.getId().equals(producto.getId())) {
+            misdatos.set(index, producto);
+            break;
+          }
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
+      }
+
+      @Override
+      public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+        Producto producto = dataSnapshot.getValue(Producto.class);
+        producto.setId(dataSnapshot.getKey());
+        int index = -1;
+        for (Producto prod : misdatos) {
+          Log.i("iteracion", prod.getId() + " = " + producto.getId());
+          index++;
+          if (prod.getId().equals(producto.getId())) {
+            misdatos.remove(index);
+            break;
+          }
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
+      }
+
+      @Override
+      public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+      }
+
+      @Override
+      public void onCancelled(@NonNull DatabaseError databaseError) {
+
+      }
+    });
+
+
+
+
+
+  }
 
 
 }
